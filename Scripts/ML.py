@@ -72,11 +72,6 @@ def load_model(model_path):
     return classifier, sc
 
 def predict_next_day(prices_bruker, classifier, sc):
-    # Uses trained model to predict if the next day's price will go UP or DOWN
-    
-    #prediction = classifier.predict(x_test_scaled[-1:])  
-    #return "UP" if prediction[0] == 1 else "DOWN"
-
     # Ensure "Price_Up" exists before dropping
     if "Price_Up" in prices_bruker.columns:
         latest_features = prices_bruker.iloc[-1:].drop(columns=["Price_Up", "Date"]).values
