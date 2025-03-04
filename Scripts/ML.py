@@ -70,19 +70,18 @@ def train_model(x_train_scaled, y_train, model_path, sc):
     #print("Model and scaler loaded successfully.")
     #return classifier, sc
 
-def predict_next_day(x_test_scaled, classifier):
+def predict_next_day(prices_bruker, classifier, sc):
     # Uses trained model to predict if the next day's price will go UP or DOWN
     
-    prediction = classifier.predict(x_test_scaled[-1:])  
+    #prediction = classifier.predict(x_test_scaled[-1:])  
+    #return "UP" if prediction[0] == 1 else "DOWN"
+
+    latest_features = prices_bruker.iloc[-1:].drop(columns=["Price_Up", "Date"]).values  # Last row
+    latest_features_scaled = sc.transform(latest_features)  # Scale it
+
+    prediction = classifier.predict(latest_features_scaled)
     return "UP" if prediction[0] == 1 else "DOWN"
 
-    # get last available row
-    #latest_features = x.iloc[-1:].values  # Last row
-    #latest_features_scaled = sc.transform(latest_features)  # Scale it
-
-    # Predict
-    #next_day_prediction = classifier.predict(latest_features_scaled)
-    #return "UP" if next_day_prediction[0] == 1 else "DOWN"
 
 def evaluate_model(classifier, x_test_scaled, y_test):
     # Evaluate trained model
