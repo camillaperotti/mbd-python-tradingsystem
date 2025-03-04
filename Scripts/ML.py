@@ -49,7 +49,7 @@ def prepare_data(prices_bruker):
     x_test_scaled = sc.transform(x_test)
 
     # Returning all variables
-    return x_train_scaled, x_test_scaled, y_train, y_test, sc
+    return prices_bruker, x_train_scaled, x_test_scaled, y_train, y_test, sc
 
 def train_model(x_train_scaled, y_train, model_path, sc):
     # Training model
@@ -122,8 +122,8 @@ def ml_pipeline(filepath, model_path):
         print("Using saved model for prediction.")
     else:
         # Train and save model if not found
-        print("Model not found, training a new one...")
-        x_train_scaled, x_test_scaled, y_train, y_test, sc = prepare_data(prices_bruker)
+        print("Model not found, training a new one.")
+        prices_bruker, x_train_scaled, x_test_scaled, y_train, y_test, sc = prepare_data(prices_bruker)
         classifier, sc = train_model(x_train_scaled, y_train, model_path, sc)
 
     # Predict next day's movement
