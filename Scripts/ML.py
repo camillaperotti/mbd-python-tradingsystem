@@ -74,23 +74,15 @@ def load_model(model_path):
 def predict_next_day(prices_bruker, classifier, sc):
     # Ensure "Price_Up" exists before dropping
     if "Price_Up" in prices_bruker.columns:
-        latest_features = prices_bruker.iloc[-1:].drop(columns=["Price_Up", "Date"]).values
+        latest_features = prices_bruker.iloc[-1:].drop(columns=["Price_Up", "Date"])
     else:
-        latest_features = prices_bruker.iloc[-1:].drop(columns=["Date"]).values  # Drop only "Date"
+        latest_features = prices_bruker.iloc[-1:].drop(columns=["Date"]) 
 
     latest_features_scaled = sc.transform(latest_features)  # Scale it
 
     prediction = classifier.predict(latest_features_scaled)
     print("Latest features used in ML.py:", latest_features)
     return "UP" if prediction[0] == 1 else "DOWN"
-
-    latest_features = prices_bruker.iloc[-1:].drop(columns=["Price_Up", "Date"]).values  # Last row
-    latest_features_scaled = sc.transform(latest_features)  # Scale it
-
-    prediction = classifier.predict(latest_features_scaled)
-    print("Latest features used in ML.py:", prices_bruker.iloc[-1:])
-    return "UP" if prediction[0] == 1 else "DOWN"
-
 
 def evaluate_model(classifier, x_test_scaled, y_test):
     # Evaluate trained model
@@ -105,9 +97,6 @@ def ml_pipeline(filepath, model_path):
 
     # Prepare data
     prices_bruker, x_train_scaled, x_test_scaled, y_train, y_test, sc = prepare_data(prices_bruker)
-
-    # Train and save model
-    #classifier, sc = train_model(x_train_scaled, y_train, model_path, sc)
 
     # Load model
     # Check if model already exists
