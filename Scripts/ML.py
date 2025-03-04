@@ -106,7 +106,7 @@ def ml_pipeline(filepath, model_path):
     # Check if model already exists
     if os.path.exists(model_path):
         # Load the trained model
-        model, sc = load_model(model_path)
+        classifier, sc = load_model(model_path)
         print("Using saved model for prediction.")
     else:
         # Train and save model if not found
