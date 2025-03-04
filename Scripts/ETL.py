@@ -1,3 +1,5 @@
+import pandas as pd
+
 def load_data(filepath):
     # Load data
     prices = pd.read_csv(filepath,delimiter=';')
@@ -42,6 +44,6 @@ if __name__ == "__main__":
     # raw data file
     filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/data/us-shareprices-daily.csv"
     # clean data file
-    output_filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/pricesbruker_output.csv"
+    output_filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/test"
 
 etl_pipeline(filepath, output_filepath)
