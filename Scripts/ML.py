@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 import seaborn as sns
 import joblib
+import os
 
 
 def load_data(filepath):
