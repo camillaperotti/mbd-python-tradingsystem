@@ -46,4 +46,4 @@ if __name__ == "__main__":
     # clean data file
     output_filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/pricesbruker_output.csv"
 
-etl_pipeline(filepath, output_filepath)
+    etl_pipeline(filepath, output_filepath)

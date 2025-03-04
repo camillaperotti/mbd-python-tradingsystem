@@ -48,24 +48,55 @@ def prepare_data(prices_bruker):
     x_test_scaled = sc.transform(x_test)
 
     # Returning all variables
-    return x_train_scaled, y_train
+    return x_train_scaled, x_test_scaled, y_train, y_test
 
-def train_model(x_train_scaled, y_train):
+def train_model(x_train_scaled, y_train, model_path):
     # Training model
     classifier = LogisticRegression(random_state = 1)
     classifier.fit(x_train_scaled, y_train) 
 
     # Save trained model
-    
+    joblib.dump(classifier, model_path)
+    print(f"Model trained and saved at {model_path}")
 
-def save_model()
+    # Return trained model
+    return classifier
 
+def load_model(model_path):
+    # load the model
+    model = joblib.load(model_path)
+    print("Model loaded successfully.")
+    return model
 
+def predict_next_day(x_test_scaled, model):
+    # Uses trained model to predict if the next day's price will go UP or DOWN
+    prediction = model.predict(x_test_scaled[-1:])  
+    return "UP" if prediction[0] == 1 else "DOWN"
 
+def ml_pipeline(filepath, model_path):
+    # Load data
+    prices_bruker = load_data(filepath)
+
+    # Prepare data
+    x_train_scaled, x_test_scaled, y_train, y_test = prepare_data(prices_bruker)
+
+    # Train and save model
+    model = train_model(x_train_scaled, y_train, model_path)
+
+    # Load model for predictions
+    model = load_model(model_path)
+
+    # Make prediction for next day
+    prediction = predict_next_day(x_test_scaled, model)
+
+    print(f"Next day's price movement: {prediction}")
 
 
 if __name__ == "__main__":
     # clean data file as input
     filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/pricesbruker_output.csv"
-    # output ?? model pkl??
-    output_filepath = 
+    
+    # model path as output
+    model_path = "models/model.pkl"
+
+    ml_pipeline(filepath, model_path)
