@@ -72,8 +72,17 @@ def load_model(model_path):
 
 def predict_next_day(x_test_scaled, model):
     # Uses trained model to predict if the next day's price will go UP or DOWN
-    prediction = model.predict(x_test_scaled[-1:])  
-    return "UP" if prediction[0] == 1 else "DOWN"
+    
+    #prediction = model.predict(x_test_scaled[-1:])  
+    #return "UP" if prediction[0] == 1 else "DOWN"
+    
+    # get last available row
+    latest_features = x.iloc[-1:].values  # Last row
+    latest_features_scaled = sc.transform(latest_features)  # Scale it
+
+    # Predict
+    next_day_prediction = classifier.predict(latest_features_scaled)
+    return "UP" if next_day_prediction[0] == 1 else "DOWN"
 
 def evaluate_model(model, x_test_scaled, y_test):
     # Evaluate trained model
