@@ -63,12 +63,12 @@ def train_model(x_train_scaled, y_train, model_path, sc):
     # Return trained model
     return classifier, sc
 
-#def load_model(model_path): 
+def load_model(model_path): 
     # load the model
-    #classifier = joblib.load(model_path)
-    #sc = joblib.load(model_path.replace("model.pkl", "scaler.pkl"))
-    #print("Model and scaler loaded successfully.")
-    #return classifier, sc
+    classifier = joblib.load(model_path)
+    sc = joblib.load(model_path.replace("model.pkl", "scaler.pkl"))
+    print("Model and scaler loaded successfully.")
+    return classifier, sc
 
 def predict_next_day(prices_bruker, classifier, sc):
     # Uses trained model to predict if the next day's price will go UP or DOWN
@@ -80,6 +80,7 @@ def predict_next_day(prices_bruker, classifier, sc):
     latest_features_scaled = sc.transform(latest_features)  # Scale it
 
     prediction = classifier.predict(latest_features_scaled)
+    print("Latest features used in ML.py:", prices_bruker.iloc[-1:])
     return "UP" if prediction[0] == 1 else "DOWN"
 
 
@@ -95,16 +96,26 @@ def ml_pipeline(filepath, model_path):
     prices_bruker = load_data(filepath)
 
     # Prepare data
-    x_train_scaled, x_test_scaled, y_train, y_test, sc = prepare_data(prices_bruker)
+    #x_train_scaled, x_test_scaled, y_train, y_test, sc = prepare_data(prices_bruker)
 
     # Train and save model
-    model, sc = train_model(x_train_scaled, y_train, model_path, sc)
+    #classifier, sc = train_model(x_train_scaled, y_train, model_path, sc)
 
-    # Make prediction for next day
-    prediction = predict_next_day(x_test_scaled, model)
+    # Load model
+    # Check if model already exists
+    if os.path.exists(model_path):
+        # Load the trained model
+        model, sc = load_model(model_path)
+        print("Using saved model for prediction.")
+    else:
+        # Train and save model if not found
+        print("Model not found, training a new one...")
+        x_train_scaled, x_test_scaled, y_train, y_test, sc = prepare_data(prices_bruker)
+        classifier, sc = train_model(x_train_scaled, y_train, model_path, sc)
 
+    # Predict next day's movement
+    prediction = predict_next_day(prices_bruker, classifier, sc)
     print(f"Next day's price movement: {prediction}")
-
 
 if __name__ == "__main__":
     # clean data file as input
