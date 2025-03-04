@@ -87,7 +87,7 @@ def ml_pipeline(filepath, model_path):
     prices_bruker = load_data(filepath)
 
     # Prepare data
-    x_train_scaled, x_test_scaled, y_train, sc = prepare_data(prices_bruker)
+    x_train_scaled, x_test_scaled, y_train, y_test, sc = prepare_data(prices_bruker)
 
     # Train and save model
     model, sc = train_model(x_train_scaled, y_train, model_path, sc)
