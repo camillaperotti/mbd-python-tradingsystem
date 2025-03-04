@@ -48,30 +48,39 @@ def prepare_data(prices_bruker):
     x_test_scaled = sc.transform(x_test)
 
     # Returning all variables
-    return x_train_scaled, x_test_scaled, y_train, y_test
+    return x_train_scaled, x_test_scaled, y_train, y_test, sc
 
-def train_model(x_train_scaled, y_train, model_path):
+def train_model(x_train_scaled, y_train, model_path, sc):
     # Training model
     classifier = LogisticRegression(random_state = 1)
     classifier.fit(x_train_scaled, y_train) 
 
-    # Save trained model
+    # Save trained model and scaler
     joblib.dump(classifier, model_path)
+    joblib.dump(sc, model_path.replace("model.pkl", "scaler.pkl"))
     print(f"Model trained and saved at {model_path}")
 
     # Return trained model
-    return classifier
+    return classifier, sc # sc needed here ?
 
 def load_model(model_path):
     # load the model
     model = joblib.load(model_path)
-    print("Model loaded successfully.")
-    return model
+    sc = joblib.load(model_path.replace("model.pkl", "scaler.pkl"))
+    print("Model and scaler loaded successfully.")
+    return model, sc
 
 def predict_next_day(x_test_scaled, model):
     # Uses trained model to predict if the next day's price will go UP or DOWN
     prediction = model.predict(x_test_scaled[-1:])  
     return "UP" if prediction[0] == 1 else "DOWN"
+
+def evaluate_model(model, x_test_scaled, y_test):
+    # Evaluate trained model
+    y_pred = model.predict(x_test_scaled)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Model Accuracy: {accuracy:.2f}")
+    return accuracy
 
 def ml_pipeline(filepath, model_path):
     # Load data
@@ -81,10 +90,10 @@ def ml_pipeline(filepath, model_path):
     x_train_scaled, x_test_scaled, y_train, y_test = prepare_data(prices_bruker)
 
     # Train and save model
-    model = train_model(x_train_scaled, y_train, model_path)
+    model, sc = train_model(x_train_scaled, y_train, model_path, sc)
 
     # Load model for predictions
-    model = load_model(model_path)
+    model, sc = load_model(model_path)
 
     # Make prediction for next day
     prediction = predict_next_day(x_test_scaled, model)
