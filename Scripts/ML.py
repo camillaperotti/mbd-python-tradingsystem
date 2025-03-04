@@ -61,14 +61,14 @@ def train_model(x_train_scaled, y_train, model_path, sc):
     print(f"Model trained and saved at {model_path}")
 
     # Return trained model
-    return classifier, sc # sc needed here ?
-
-def load_model(model_path):
-    # load the model
-    classifier = joblib.load(model_path)
-    sc = joblib.load(model_path.replace("model.pkl", "scaler.pkl"))
-    print("Model and scaler loaded successfully.")
     return classifier, sc
+
+#def load_model(model_path): 
+    # load the model
+    #classifier = joblib.load(model_path)
+    #sc = joblib.load(model_path.replace("model.pkl", "scaler.pkl"))
+    #print("Model and scaler loaded successfully.")
+    #return classifier, sc
 
 def predict_next_day(x_test_scaled, classifier):
     # Uses trained model to predict if the next day's price will go UP or DOWN
@@ -100,9 +100,6 @@ def ml_pipeline(filepath, model_path):
 
     # Train and save model
     model, sc = train_model(x_train_scaled, y_train, model_path, sc)
-
-    # Load model for predictions
-    model, sc = load_model(model_path)
 
     # Make prediction for next day
     prediction = predict_next_day(x_test_scaled, model)
