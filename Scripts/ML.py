@@ -11,7 +11,7 @@ import os
 
 def load_data(filepath):
     # Load clean file
-    prices_bruker = pd.read_csv(filepath)
+    prices_bruker = pd.read_csv(filepath,index_col=0)
     
     # Return dataframe
     return prices_bruker
