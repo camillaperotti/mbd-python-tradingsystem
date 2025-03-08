@@ -20,7 +20,7 @@ def main():
     This website contains several parts
     - **Homepage**: Contains information about the trading system app, instructions on how to use it.
     - **Trading Prediction and Company Deep Dive**: Trading prediction for selected company plus detailed information on the company.
-    - **Group Work Organization**: Information about the project team and work distribution.
+    - **Group Work Organization**: Information about the project team and work distribution. hello
 
              
     ### Trading system app: 
