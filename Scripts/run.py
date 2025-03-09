@@ -60,7 +60,7 @@ class Company:
         for day in range(1, 5):
             prices[f"Price d-{day}"] = prices.groupby("Ticker")["Price"].shift(day)
         
-        # Drop missing values and last row per ticker
+        # Drop missing values
         prices = prices.dropna()
         
         # Define target variable (if price goes up the next day)
