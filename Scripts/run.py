@@ -1,219 +1,151 @@
-
+import argparse
 import pandas as pd
 import numpy as np
+import joblib
+import os
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-import seaborn as sns
-import joblib
-import os
 
 class Company:
-
-    def __init__(self, ticker) -> None:
-
-        # attributes
+    def __init__(self, ticker):
+        
         self.ticker = ticker
-    
-    # methods
+        self.prices = None  # Data will be assigned later after ETL
+        self.model = None
+        self.scaler = None
+        self.model_path = f"models/model_{self.ticker}.pkl"
+        self.scaler_path = f"models/scaler_{self.ticker}.pkl"
+
     def load_data(self, filepath):
-        # Load data
-        prices_all = pd.read_csv(filepath,delimiter=';')
-
-        # Select 5 companies' price data
-        prices = prices_all[prices_all["SimFinId"].isin([1253240, 111052, 63877,56317, 59265])]
-
-        # Return prices_bruker df
+        # Load full dataset and filter only relevant 5 companies
+        prices_all = pd.read_csv(filepath, delimiter=';')
+        prices = prices_all[prices_all["SimFinId"].isin([1253240, 111052, 63877, 56317, 59265])]
         return prices
 
     def process_data(self, prices):
-         # Impute missing values
+        # Handle missing values, convert to correct data types
         prices["Dividend"] = prices["Dividend"].fillna(0)
-
-        # Transform to correct data types
-        prices["Shares Outstanding"] =  prices["Shares Outstanding"].astype(int)
-        prices["Date"] = pd.to_datetime(prices.Date, format="%Y-%m-%d")
-
-        # Return prices_bruker df
+        prices["Shares Outstanding"] = prices["Shares Outstanding"].astype(int)
+        prices["Date"] = pd.to_datetime(prices["Date"], format="%Y-%m-%d")
         return prices
     
     def save_data(self, prices, output_filepath):
-        prices.to_csv(output_filepath)
+        prices.to_csv(output_filepath, index=False)
         print(f"Processed data saved to {output_filepath}")
 
     def etl_pipeline(self, filepath, output_filepath):
-        # Extract
+        # Run the ETL pipeline (Extract, Transform, Load)
+        print(f"Starting ETL for {self.ticker}...")
         self.prices = self.load_data(filepath)
-        print(f"Data loaded from {filepath}")
-        
-        # Transform
         self.prices = self.process_data(self.prices)
-        print("Data processed successfully")
-        
-        # Load
         self.save_data(self.prices, output_filepath)
+        print("ETL Completed!\n")
 
-        return self.prices 
+    def prepare_data(self):
+        print(f"Preparing data for {self.ticker} for ML")
 
+        # Filter for the current ticker only
+        prices = self.prices[self.prices["Ticker"] == self.ticker]
+        prices = prices.copy()
 
-    def prepare_data(self, prices):
-        # Ensure data is sorted by ticker and date
+        # Sort and clean
         prices.sort_values(by=["Ticker", "Date"], inplace=True) 
         prices.reset_index(drop=True, inplace=True) 
+        prices.drop(columns=["SimFinId", "Open", "High", "Low", "Close", "Volume", "Dividend", "Shares Outstanding"], inplace=True)
+        prices.rename(columns={"Adj. Close": "Price"}, inplace=True)
 
-        # Drop all unwanted columns, rename adjusted close column
-        prices.drop(columns=["SimFinId","Open","High", "Low", "Close", "Volume", "Dividend","Shares Outstanding"],inplace = True)
-        prices.rename(columns={"Adj. Close": "Price"}, inplace= True)
-
-        # Adding last 4 days' prices into the df
-        days = 4
-
-        # Apply shift only within each stock ticker
-        for day in range(1, days + 1):
+        # Add last 4 days' prices
+        for day in range(1, 5):
             prices[f"Price d-{day}"] = prices.groupby("Ticker")["Price"].shift(day)
-
-        #dropping first rows with missing values
+        
+        # Drop missing values and last row per ticker
         prices = prices.dropna()
-
-        # Adding prediction
+        
+        # Define target variable (if price goes up the next day)
         prices["Price_Up"] = (prices["Price"].shift(-1) > prices["Price"]).astype(int)
         
         # Drop last row per ticker
-        last_rows = prices.groupby("Ticker").tail(1).index
-        prices = prices.drop(index=last_rows).reset_index(drop=True)
-
-        # Return prices
-        return prices 
-        # Splitting features from target
-        #x = prices.drop(columns=["Price_Up", "Date"])
-        #y = prices["Price_Up"]
-
-        # Splitting data into training and testing
-        #x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
-
-        # Scaling the features (x):
-        #sc = StandardScaler()
-        #x_train_scaled = sc.fit_transform(x_train)
-        #x_test_scaled = sc.transform(x_test)
-
-        # Returning all variables
-        #return prices, x_train_scaled, x_test_scaled, y_train, y_test, sc
-
-    def train_model(self, prices):
-        # Get the list of unique tickers
-        tickers = prices["Ticker"].unique()
-
-        # Iterate over each company (ticker)
-        for ticker in tickers:
-            print(f"\nTraining model for {ticker}...")
-
-            # Filter data for the current stock
-            stock_data = prices[prices["Ticker"] == ticker]
-
-            # Prepare the features (X) and target (y)
-            X = stock_data.drop(columns=["Ticker", "Date", "Price_Up"])  
-            y = stock_data["Price_Up"]  
-
-            # Standardize the features
-            scaler = StandardScaler()
-            X_scaled = scaler.fit_transform(X)
-
-            # Split the dataset into training and testing sets
-            X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=1)
-
-            # Train a Logistic Regression model
-            model = LogisticRegression()
-            model.fit(X_train, y_train)
-
-            # Evaluate the model
-            y_pred = model.predict(X_test)
-            accuracy = accuracy_score(y_test, y_pred)
-            print(f"Accuracy for {ticker}: {accuracy:.4f}")
-
-            # Define file paths
-            model_path = f"/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/Scripts/models/model_{ticker}.pkl"
-            scaler_path = f"/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/Scripts/models/scaler_{ticker}.pkl"
-
-            # Save trained model
-            joblib.dump(model, model_path)
-            print(f"Model saved at {model_path}")
-
-            # Save scaler
-            joblib.dump(scaler, scaler_path)
-            print(f"Scaler saved at {scaler_path}")
-
+        prices = prices.drop(prices.groupby("Ticker").tail(1).index).reset_index(drop=True)
         
-        
-        # Training model
-        classifier = LogisticRegression(random_state = 1)
-        classifier.fit(x_train_scaled, y_train) 
+        # Save processed prices
+        self.prices = prices  
+        print("Data preparation for ML completed!\n")
 
-        # Save trained model and scaler
-        joblib.dump(classifier, model_path)
-        joblib.dump(sc, model_path.replace("model.pkl", "scaler.pkl"))
-        print(f"Model trained and saved at {model_path}")
+    def train_model(self):
+        # Logistic Regression model
+        print(f"Training model for {self.ticker}...")
 
-        # Return trained model
-        return classifier, sc
+        # Define features and target
+        X = self.prices.drop(columns=["Ticker", "Date", "Price_Up"])
+        y = self.prices["Price_Up"]
 
-    def load_model(self, model_path): 
-        # load the model
-        classifier = joblib.load(model_path)
-        sc = joblib.load(model_path.replace("model.pkl", "scaler.pkl"))
-        print("Model and scaler loaded successfully.")
-        return classifier, sc
+        # Scale features
+        self.scaler = StandardScaler()
+        X_scaled = self.scaler.fit_transform(X)
 
-    def predict_next_day(self, prices, classifier, sc):
-        # Ensure "Price_Up" exists before dropping
-        if "Price_Up" in prices.columns:
-            latest_features = prices.iloc[-1:].drop(columns=["Price_Up", "Date"])
-        else:
-            latest_features = prices.iloc[-1:].drop(columns=["Date"]) 
+        # Train/test split
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-        latest_features_scaled = sc.transform(latest_features)  # Scale it
+        # Train Logistic Regression model
+        self.model = LogisticRegression()
+        self.model.fit(X_train, y_train)
 
-        prediction = classifier.predict(latest_features_scaled)
-        print("Latest features used in ML.py:", latest_features)
+        # Evaluate
+        y_pred = self.model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        print(f"Accuracy for {self.ticker}: {accuracy:.4f}\n")
+
+        # Save model and scaler
+        joblib.dump(self.model, self.model_path)
+        joblib.dump(self.scaler, self.scaler_path)
+
+        print(f"Model saved at {self.model_path}")
+        print(f"Scaler saved at {self.scaler_path}\n")
+
+    def load_model(self):
+        # Load trained model and scaler for this ticker
+        if not os.path.exists(self.model_path) or not os.path.exists(self.scaler_path):
+            raise FileNotFoundError("Model or Scaler not found. Train the model first.")
+
+        self.model = joblib.load(self.model_path)
+        self.scaler = joblib.load(self.scaler_path)
+        print(f"Model and scaler for {self.ticker} loaded successfully!\n")
+
+    def predict_next_day(self):
+        # Make a prediction for the next day's price movement
+        if self.model is None or self.scaler is None:
+            raise ValueError("Model and scaler not loaded. Run load_model() first.")
+
+        # Use the last available row for prediction
+        latest_features = self.prices.iloc[-1:].drop(columns=["Price_Up", "Date","Ticker"])
+        latest_features_scaled = self.scaler.transform(latest_features)
+
+        prediction = self.model.predict(latest_features_scaled)
         return "UP" if prediction[0] == 1 else "DOWN"
 
-    def evaluate_model(self, classifier, x_test_scaled, y_test):
-        # Evaluate trained model
-        y_pred = classifier.predict(x_test_scaled)
-        accuracy = accuracy_score(y_test, y_pred)
-        print(f"Model Accuracy: {accuracy:.2f}")
-        return accuracy
-
-    def ml_pipeline(self, model_path):
-        # Prepare data
-        prices, x_train_scaled, x_test_scaled, y_train, y_test, sc = self.prepare_data(self.prices)
-
-        # Load model
-        # Check if model already exists
-        if os.path.exists(model_path):
-            # Load the trained model
-            classifier, sc = self.load_model(model_path)
-            print("Using saved model for prediction.")
-        else:
-            # Train and save model if not found
-            print("Model not found, training a new one.")
-            classifier, sc = self.train_model(x_train_scaled, y_train, model_path, sc)
-
-        # Predict next day's movement
-        prediction = self.predict_next_day(prices, classifier, sc)
-        print(f"Next day's price movement: {prediction}")
 
 if __name__ == "__main__":
-    # raw data file
-    filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/data/us-shareprices-daily.csv"
-    # clean data file
-    output_filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/prices_output.csv"
+    parser = argparse.ArgumentParser(description="Run ETL and ML for a specific stock ticker")
+    parser.add_argument("ticker", type=str, help="Stock ticker symbol to process (e.g., AAPL, TSLA)")
+    args = parser.parse_args()
 
-     # model path as output
-    model_path = "models/model.pkl"
+    # File paths
+    raw_data_path = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/data/us-shareprices-daily.csv"
+    processed_data_path = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/prices_output.csv"
 
-    bruker = Company("1")
-    bruker.etl_pipeline(filepath, output_filepath)
-    bruker.ml_pipeline(model_path)
-    
+    print(f"\n========== Running for {args.ticker} ==========\n")
+    company = Company(args.ticker)
 
+    # Run ETL
+    company.etl_pipeline(raw_data_path, processed_data_path)
+
+    # Prepare and train model
+    company.prepare_data()
+    company.train_model()
+
+    # Load and predict
+    company.load_model()
+    prediction = company.predict_next_day()
+    print(f"Predicted movement for {args.ticker}: {prediction}\n")
