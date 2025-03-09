@@ -54,45 +54,97 @@ class Company:
         # Load
         self.save_data(self.prices, output_filepath)
 
-        return self.prices  # Return the processed DataFrame
+        return self.prices 
 
 
     def prepare_data(self, prices):
-        # Ensure data is sorted by date
-        prices = prices.sort_values("Date").reset_index(drop=True)
+        # Ensure data is sorted by ticker and date
+        prices.sort_values(by=["Ticker", "Date"], inplace=True) 
+        prices.reset_index(drop=True, inplace=True) 
 
         # Drop all unwanted columns, rename adjusted close column
-        prices.drop(columns=["Ticker","SimFinId","Open","High", "Low", "Close", "Volume", "Dividend","Shares Outstanding"],inplace = True)
+        prices.drop(columns=["SimFinId","Open","High", "Low", "Close", "Volume", "Dividend","Shares Outstanding"],inplace = True)
         prices.rename(columns={"Adj. Close": "Price"}, inplace= True)
 
         # Adding last 4 days' prices into the df
         days = 4
+
+        # Apply shift only within each stock ticker
         for day in range(1, days + 1):
-            prices[f"Price d-{day}"] = prices["Price"].shift(day)
+            prices[f"Price d-{day}"] = prices.groupby("Ticker")["Price"].shift(day)
 
         #dropping first rows with missing values
         prices = prices.dropna()
 
         # Adding prediction
         prices["Price_Up"] = (prices["Price"].shift(-1) > prices["Price"]).astype(int)
-        prices = prices.drop(index=1238)
+        
+        # Drop last row per ticker
+        last_rows = prices.groupby("Ticker").tail(1).index
+        prices = prices.drop(index=last_rows).reset_index(drop=True)
 
+        # Return prices
+        return prices 
         # Splitting features from target
-        x = prices.drop(columns=["Price_Up", "Date"])
-        y = prices["Price_Up"]
+        #x = prices.drop(columns=["Price_Up", "Date"])
+        #y = prices["Price_Up"]
 
         # Splitting data into training and testing
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+        #x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
 
         # Scaling the features (x):
-        sc = StandardScaler()
-        x_train_scaled = sc.fit_transform(x_train)
-        x_test_scaled = sc.transform(x_test)
+        #sc = StandardScaler()
+        #x_train_scaled = sc.fit_transform(x_train)
+        #x_test_scaled = sc.transform(x_test)
 
         # Returning all variables
-        return prices, x_train_scaled, x_test_scaled, y_train, y_test, sc
+        #return prices, x_train_scaled, x_test_scaled, y_train, y_test, sc
 
-    def train_model(self, x_train_scaled, y_train, model_path, sc):
+    def train_model(self, prices):
+        # Get the list of unique tickers
+        tickers = prices["Ticker"].unique()
+
+        # Iterate over each company (ticker)
+        for ticker in tickers:
+            print(f"\nTraining model for {ticker}...")
+
+            # Filter data for the current stock
+            stock_data = prices[prices["Ticker"] == ticker]
+
+            # Prepare the features (X) and target (y)
+            X = stock_data.drop(columns=["Ticker", "Date", "Price_Up"])  
+            y = stock_data["Price_Up"]  
+
+            # Standardize the features
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(X)
+
+            # Split the dataset into training and testing sets
+            X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=1)
+
+            # Train a Logistic Regression model
+            model = LogisticRegression()
+            model.fit(X_train, y_train)
+
+            # Evaluate the model
+            y_pred = model.predict(X_test)
+            accuracy = accuracy_score(y_test, y_pred)
+            print(f"Accuracy for {ticker}: {accuracy:.4f}")
+
+            # Define file paths
+            model_path = f"/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/Scripts/models/model_{ticker}.pkl"
+            scaler_path = f"/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/Scripts/models/scaler_{ticker}.pkl"
+
+            # Save trained model
+            joblib.dump(model, model_path)
+            print(f"Model saved at {model_path}")
+
+            # Save scaler
+            joblib.dump(scaler, scaler_path)
+            print(f"Scaler saved at {scaler_path}")
+
+        
+        
         # Training model
         classifier = LogisticRegression(random_state = 1)
         classifier.fit(x_train_scaled, y_train) 
