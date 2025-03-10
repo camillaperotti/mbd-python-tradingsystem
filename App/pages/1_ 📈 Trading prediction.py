@@ -1,39 +1,33 @@
 import streamlit as st
 import plotly.express as px
-import zipfile
-import geopandas
 import numpy as np
 import pandas as pd
+import pickle
 
-from utils import read_and_preprocess_data
+from utils import read_and_preprocess_data, load_model_and_scaler, preprocess_stock_data, make_prediction
 
-#adding the sidebar and dropdowns again
+#Load stock data
+data = read_and_preprocess_data()
 
-data, codes = read_and_preprocess_data()
+#Define 5 available stocks
+allowed_tickers = ["APPL", "ABT", "BRKR", "MSFT", "TSLA"]
 
-sources = sorted(data.src_neigh_name.unique())
-destinations = sorted(data.dst_neigh_name.unique())
-    
-source = st.sidebar.selectbox('Select the source', sources)
-destination = st.sidebar.selectbox('Select the destination', destinations)
-    
-aux = data[(data.src_neigh_name == source) & (data.dst_neigh_name == destination)]
-aux = aux.sort_values("date")
+#Sidebar: Stock Selection (Only Your 5 Tickers)
+st.sidebar.header("Stock Market Selection")
+tickers_in_data = sorted(set(data["Ticker"].unique()) & set(allowed_tickers))  # Ensure only available tickers are shown
+
+ticker = st.sidebar.selectbox("Select a stock:", tickers_in_data)
+
+# Filter data for the selected stock
+data_ticker = preprocess_stock_data(data, ticker)
+
+# 📊 Show Latest Stock Data
+st.subheader(f"📊 Latest Data for {ticker}")
+st.dataframe(data_ticker.tail())
+
 
 # COMPANY STOCKS
 
-fig1 = px.line(
-    aux, x="date", y="mean_travel_time", text="day_period",
-    error_y="standard_deviation_travel_time",
-    title="Travel time from {} to {}".format(source, destination),
-    template="none"
-    )
-
-fig1.update_xaxes(title="Date")
-fig1.update_yaxes(title="Avg. travel time (seconds)")
-fig1.update_traces(mode="lines+markers", marker_size=10, line_width=3, error_y_color="gray", error_y_thickness=1, error_y_width=10)
-    
-st.plotly_chart(fig1, use_container_width=True)
 
 # PREDICTION
 
