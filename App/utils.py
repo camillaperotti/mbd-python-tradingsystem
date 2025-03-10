@@ -1,6 +1,4 @@
-import geopandas 
 import pandas as pd
-import zipfile
 import streamlit as st
 
 @st.cache_data #it will be loaded once and then saved
