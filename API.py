@@ -19,7 +19,7 @@ class PySimFin:
     def __init__(self, api_key):
         self.api_key = api_key
         self.headers = {
-        'Authorization': f'Bearer {api_key}'
+        'Authorization': f'{api_key}'
     }
 
         # Configure logging
@@ -28,7 +28,7 @@ class PySimFin:
 
 
     #Method to fetch data from the SimFin API
-    def _get_data(self, endpoint: str, params: dict):
+    def get_data(self, endpoint: str, params: dict):
 
         try:
             url = f'{self.base_url}{endpoint}'
@@ -64,9 +64,19 @@ class PySimFin:
 
         self.logger.info(f"Fetching share prices for {ticker} from {start} to {end}")
         params = {"ticker": ticker, "start": start, "end": end}
-        return self._get_data("companies/prices/verbose", params)
+        
+        df = self.get_data("companies/prices/verbose", params)
+
+        # Expand the 'data' column (data is a list of dictionaries)
+        df_expanded = df.explode("data") 
+
+        # Convert dictionary row into separate columns
+        df_expanded = pd.concat([df_expanded.drop(columns=["data"]), df_expanded["data"].apply(pd.Series)], axis=1)
+
+        return df_expanded
+        
     
-    #his method will return DataFrame with financial statements for the ticker provided in the provided time range.
+    #This method will return DataFrame with financial statements for the ticker provided in the provided time range.
     def get_financial_statement(self, ticker: str, statement: str, start: str, end: str) -> pd.DataFrame:
 
         try:
@@ -78,12 +88,28 @@ class PySimFin:
             self.logger.error("Invalid date format. Please use YYYY-MM-DD.")
             return pd.DataFrame()  # Return an empty DataFrame on error
         
-        # Validate statement type
-        valid_statements = ["pl", "bs", "cf"]
+        # Validate statement type (one of the inputs for the API request)
+        valid_statements = ['PL', 'BS', 'CF', 'DERIVED']
+        #PL = Profit & Loss; BS = Balance Sheet; CF = Cash Flow; DERIVED = Derived Ratios and Indicators
+
         if statement not in valid_statements:
             self.logger.error(f"Invalid statement type '{statement}'. Must be one of {valid_statements}.")
             return pd.DataFrame()
 
         self.logger.info(f"Fetching financial statements for {ticker} from {start} to {end}")
         params = {"ticker": ticker, 'statements': statement, "start": start, "end": end}
-        return self._get_data("companies/statements/verbose", params)
+        
+        df = self.get_data("companies/statements/verbose", params)
+
+        return df
+    
+
+    #This method will return DataFrame with information data about the company
+    def get_general_data(self, ticker: str) -> pd.DataFrame:
+
+        self.logger.info(f"Fetching general data for {ticker}")
+        params = {"ticker": ticker}
+        
+        df = self.get_data("companies/general/verbose", params)
+
+        return df
