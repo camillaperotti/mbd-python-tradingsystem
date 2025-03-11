@@ -62,18 +62,23 @@ class PySimFin:
             self.logger.error("Invalid date format. Please use YYYY-MM-DD.")
             return pd.DataFrame()  # Return an empty DataFrame on error
 
-        self.logger.info(f"Fetching share prices for {ticker} from {start} to {end}")
+        self.logger.info(f"Fetching share prices for {ticker} from {start} to {end}.")
         params = {"ticker": ticker, "start": start, "end": end}
         
         df = self.get_data("companies/prices/verbose", params)
 
+        # Check if DataFrame is empty
+        if df.empty:
+            self.logger.warning(f"No data available for {ticker} from {start} to {end}.")
+            return pd.DataFrame()
+
         # Expand the 'data' column (data is a list of dictionaries)
-        df_expanded = df.explode("data") 
+        df = df.explode("data") 
 
         # Convert dictionary row into separate columns
-        df_expanded = pd.concat([df_expanded.drop(columns=["data"]), df_expanded["data"].apply(pd.Series)], axis=1)
+        df = pd.concat([df.drop(columns=["data"]), df["data"].apply(pd.Series)], axis=1)
 
-        return df_expanded
+        return df
         
     
     #This method will return DataFrame with financial statements for the ticker provided in the provided time range.
@@ -101,6 +106,30 @@ class PySimFin:
         
         df = self.get_data("companies/statements/verbose", params)
 
+        # Check if DataFrame is empty
+        if df.empty:
+            self.logger.warning(f"No {statement} available for {ticker} from {start} to {end}.")
+            return pd.DataFrame()
+        
+        # Ensure 'statements' is exploded properly
+        df = df.explode("statements", ignore_index=True)
+
+        # Extract 'statement' type and expand the 'data' column
+        df["statement_type"] = df["statements"].apply(lambda x: x["statement"])
+        df["data"] = df["statements"].apply(lambda x: x["data"])
+
+        # Drop the original 'statements' column
+        df = df.drop(columns=["statements"])
+
+        # Explode the 'data' column to ensure each entry is in a separate row
+        df = df.explode("data", ignore_index=True)
+
+        # Convert each dictionary row into separate columns
+        data_expanded = df["data"].apply(pd.Series)
+
+        # Drop the original 'data' column and concatenate expanded data
+        df = pd.concat([df.drop(columns=["data"]), data_expanded], axis=1)
+
         return df
     
 
@@ -111,5 +140,10 @@ class PySimFin:
         params = {"ticker": ticker}
         
         df = self.get_data("companies/general/verbose", params)
+
+        # Check if DataFrame is empty
+        if df.empty:
+            self.logger.warning(f"No data available for {ticker}.")
+            return pd.DataFrame()
 
         return df
