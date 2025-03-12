@@ -2,12 +2,18 @@ import streamlit as st
 import plotly.express as px
 import numpy as np
 import pandas as pd
-import joblib
 
+import joblib
+import os
+import sys
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), "..")))
+from API import PySimFin
+from datetime import datetime, timedelta
 
-from utils import read_and_preprocess_data, load_model_and_scaler, preprocess_stock_data, make_prediction, get_trained_features
+
+from utils import read_and_preprocess_data, load_model_and_scaler, preprocess_stock_data, make_prediction
 
 #Load stock data
 data = read_and_preprocess_data()
@@ -29,6 +35,7 @@ data_ticker = preprocess_stock_data(data, ticker)
 st.subheader(f"📊 Latest Data for {ticker}")
 st.dataframe(data_ticker.tail())
 
+#GRAPH, historical data
 # Stock Price Evolution Graph
 fig = px.line(data_ticker, x="Date", y="Close", title=f"{ticker} Price Evolution", template="none")
 fig.update_xaxes(title="Date")
