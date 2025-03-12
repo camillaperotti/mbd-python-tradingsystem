@@ -6,8 +6,6 @@ import joblib
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 
 from utils import read_and_preprocess_data, load_model_and_scaler, preprocess_stock_data, make_prediction, get_trained_features
 
@@ -15,7 +13,7 @@ from utils import read_and_preprocess_data, load_model_and_scaler, preprocess_st
 data = read_and_preprocess_data()
 
 #Define 5 available stocks
-allowed_tickers = ["APPL", "ABT", "BRKR", "MSFT", "TSLA"]
+allowed_tickers = ["AAPL", "ABT", "BRKR", "MSFT", "TSLA"]
 
 #Sidebar: Stock Selection (Only Your 5 Tickers)
 st.sidebar.header("Stock Market Selection")

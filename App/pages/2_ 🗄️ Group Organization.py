@@ -1,39 +1,44 @@
-import zipfile
-import geopandas
-import numpy as np
-import pandas as pd
-
 import streamlit as st
-import plotly.express as px
 
-from utils import read_and_preprocess_data
+# 🎯 Team Organization Page
+st.title("📌 Team Organization")
 
-#adding the sidebar and dropdowns again
+# 🏆 Project Introduction
+st.markdown("""
+Welcome to our **team organization page**!  
+We are a group of four members working on an **automated trading prediction system** using **Machine Learning** and **Streamlit**.
 
-data, codes = read_and_preprocess_data()
+Our approach followed these key steps:
+1. 📊 **Data exploration and cleaning**  
+2. 📈 **Time series analysis**  
+3. 🤖 **Model training and optimization**  
+4. 🛠 **Streamlit app development**  
+5. 🚀 **Final implementation and testing**
+""")
 
-sources = sorted(data.src_neigh_name.unique())
-destinations = sorted(data.dst_neigh_name.unique())
-    
-source = st.sidebar.selectbox('Select the source', sources)
-destination = st.sidebar.selectbox('Select the destination', destinations)
-    
-aux = data[(data.src_neigh_name == source) & (data.dst_neigh_name == destination)]
-aux = aux.sort_values("date")
+# 📌 Process Overview (Replace with an actual diagram)
+#st.subheader("📌 Project Workflow")
+#st.image("images/path_to_diagram.png", caption="Workflow Diagram", use_column_width=True)  
 
+# 👥 Team Section
+st.subheader("👥 Meet Our Team")
 
-#CHART 2
-aux2 = aux.groupby(["day_of_week_str","day_of_week", "day_period", "start_hour"])[["mean_travel_time"]].mean().reset_index()
-    
-fig2 = px.bar(
-    aux2.sort_values(["start_hour","day_of_week"]), x="day_of_week_str", y="mean_travel_time",
-    color="day_period", barmode="group", opacity=0.7, color_discrete_sequence=px.colors.sequential.RdBu_r,
-    category_orders={"day_of_week_str": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]},
-    title="Avg. travel time from {} to {} by day of week".format(source, destination),
-    template="none")
+# 📌 Team Members Data (with correct image paths)
+team_members = [
+    {"name": "Camilla Perotti", "image": "App/images/camilla.jpg"},
+    {"name": "Héctor Marmol", "image": "App/images/hector.jpg"},
+    {"name": "Tomás Silva", "image": "App/images/tomas.jpg"},
+    {"name": "Lucía Sarobe", "image": "App/images/lucia.jpg"},
+]
 
-fig2.update_xaxes(title="Period of Day")
-fig2.update_yaxes(title="Avg. travel time (seconds)")
-fig2.update_layout(legend_title="Day Period")
-    
-st.plotly_chart(fig2, use_container_width=True)
+# Display team members in a 4-column layout
+cols = st.columns(4)
+
+for i, member in enumerate(team_members):
+    with cols[i]:
+        st.image(member["image"], caption=member["name"], use_container_width=True)
+        
+# Footer
+st.markdown("---")
+st.markdown("📢 *Thank you for visiting our team page!*")
+
