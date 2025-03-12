@@ -70,7 +70,7 @@ class PySimFin:
         # Check if DataFrame is empty
         if df.empty:
             self.logger.warning(f"No data available for {ticker} from {start} to {end}.")
-            return pd.DataFrame()
+            return pd.DataFrame() # Return an empty DataFrame on error
 
         # Expand the 'data' column (data is a list of dictionaries)
         df = df.explode("data") 
@@ -99,7 +99,7 @@ class PySimFin:
 
         if statement not in valid_statements:
             self.logger.error(f"Invalid statement type '{statement}'. Must be one of {valid_statements}.")
-            return pd.DataFrame()
+            return pd.DataFrame() # Return an empty DataFrame on error
 
         self.logger.info(f"Fetching financial statements for {ticker} from {start} to {end}")
         params = {"ticker": ticker, 'statements': statement, "start": start, "end": end}
