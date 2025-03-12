@@ -151,6 +151,13 @@ class PySimFin:
 
 #Define class NewsAPI - retrieve news from different companies
 
+#These are the codes of the companies we are predicting to retrieve the news. In this API it is not the ticker, but the name
+#AAPL = Apple
+#ABT = Abbott
+#BRKR = Bruker
+#MSFT = Microsoft
+#TSLA = Tesla
+
 class NewsAPI:
 
     base_url = 'https://newsapi.org/v2/everything'
