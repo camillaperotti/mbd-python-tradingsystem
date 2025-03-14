@@ -6,7 +6,7 @@ import requests
 import logging
 import pandas as pd
 from datetime import datetime
-from Scripts.Exceptions import SimFinError, ResourceNotFoundError
+from Exceptions import SimFinError, ResourceNotFoundError
 
 
 #Define class PySimFin - main client for the SimFin wrapper
