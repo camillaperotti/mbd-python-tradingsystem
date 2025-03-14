@@ -6,14 +6,10 @@ scikit_learn==1.6.1
 seaborn==0.13.2
 streamlit==1.43.2
 
-import numpy as np
-import streamlit as st
 import plotly.express as px
 from utils import read_and_preprocess_data
 
 import plotly
-import pandas as pd
-import joblib
 import os
 import sys
 from datetime import datetime, timedelta
