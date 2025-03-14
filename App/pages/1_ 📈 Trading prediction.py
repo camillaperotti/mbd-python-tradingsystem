@@ -24,7 +24,7 @@ data = read_and_preprocess_data()
 #Define 5 available stocks
 allowed_tickers = ["AAPL", "ABT", "BRKR", "MSFT", "TSLA"]
 
-##Sidebar: Stock Selection (Only Your 5 Tickers)
+##SIDEBAR: Stock Selection (Only Your 5 Tickers)
 st.sidebar.header("Stock Market Selection")
 tickers_in_data = sorted(set(data["Ticker"].unique()) & set(allowed_tickers))  # Ensure only available tickers are shown
 ticker = st.sidebar.selectbox("Select a stock:", tickers_in_data)
@@ -33,11 +33,11 @@ ticker = st.sidebar.selectbox("Select a stock:", tickers_in_data)
 # Show Latest Stock Data
 st.subheader(f"📊 Latest Historical Data for {ticker}")
 data_ticker = preprocess_stock_data(data, ticker)
-st.dataframe(data_ticker.tail())
 
 #GRAPH, Historical data
 # Stock Price Evolution Graph
-fig = px.line(data_ticker, x="Date", y="Close", title=f"{ticker} Price Evolution - Historical Data", template="none")
+fig = px.line(data_ticker, x="Date", y="Close", 
+              title=f"{ticker} Price Evolution - Historical Data", template="none")
 fig.update_xaxes(title="Date")
 fig.update_yaxes(title="Closing Price")
 st.plotly_chart(fig, use_container_width=True)
@@ -45,9 +45,6 @@ st.plotly_chart(fig, use_container_width=True)
 ##PREDICTION
 # STREAMLIT APP
 st.title("📊 Stock Price Movement Predictor")
-
-# User input for the stock ticker
-ticker = st.selectbox("🔍 Select a stock for prediction:", allowed_tickers, index=allowed_tickers.index("AAPL"))
 
 if st.button("Predict Stock Movement"):
     st.write(f"### Predicting for {ticker}...")
