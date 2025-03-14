@@ -1,38 +1,8 @@
-API==0.0.7
 joblib==1.4.2
 numpy==2.2.3
 pandas==2.2.3
+plotly==6.0.0
+Requests==2.32.3
 scikit_learn==1.6.1
 seaborn==0.13.2
 streamlit==1.43.2
-
-plotly
-from utils import read_and_preprocess_data
-
-import plotly
-import os
-import sys
-from datetime import datetime, timedelta
-
-# Import custom scripts
-from Scripts.API import PySimFin
-from Scripts.Exceptions import SimFinError, ResourceNotFoundError
-from Scripts.predict import Prediction
-from utils import read_and_preprocess_data, preprocess_stock_data
-
-#API
-import requests
-import logging
-from datetime import datetime
-from Scripts.Exceptions import SimFinError, ResourceNotFoundError
-
-#Predict
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-
-#Run
-import argparse
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
