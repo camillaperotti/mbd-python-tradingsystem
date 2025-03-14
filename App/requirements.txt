@@ -11,6 +11,7 @@ import streamlit as st
 import plotly.express as px
 from utils import read_and_preprocess_data
 
+import plotly
 import pandas as pd
 import joblib
 import os
