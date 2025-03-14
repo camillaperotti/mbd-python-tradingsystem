@@ -8,6 +8,13 @@ import seaborn as sns
 import joblib
 import os
 
+# Get the script's directory
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Define dynamic paths
+filepath = os.path.join(base_dir, "ETL", "pricesbruker_output.csv")
+model_dir = os.path.join(base_dir, "Scripts", "models")
+model_path = os.path.join(model_dir, "model_BRKR.pkl")
 
 def load_data(filepath):
     # Load clean file
@@ -58,7 +65,7 @@ def train_model(x_train_scaled, y_train, model_path, sc):
 
     # Save trained model and scaler
     joblib.dump(classifier, model_path)
-    joblib.dump(sc, model_path.replace("model.pkl", "scaler.pkl"))
+    joblib.dump(sc, model_path.replace("models/model_BRKR.pkl", "models/scaler_BRKR.pkl"))
     print(f"Model trained and saved at {model_path}")
 
     # Return trained model
@@ -67,7 +74,7 @@ def train_model(x_train_scaled, y_train, model_path, sc):
 def load_model(model_path): 
     # load the model
     classifier = joblib.load(model_path)
-    sc = joblib.load(model_path.replace("model.pkl", "scaler.pkl"))
+    sc = joblib.load(model_path.replace("models/model_BRKR.pkl", "models/scaler_BRKR.pkl"))
     print("Model and scaler loaded successfully.")
     return classifier, sc
 
@@ -114,10 +121,4 @@ def ml_pipeline(filepath, model_path):
     print(f"Next day's price movement: {prediction}")
 
 if __name__ == "__main__":
-    # clean data file as input
-    filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/pricesbruker_output.csv"
-    
-    # model path as output
-    model_path = "models/model.pkl"
-
     ml_pipeline(filepath, model_path)
