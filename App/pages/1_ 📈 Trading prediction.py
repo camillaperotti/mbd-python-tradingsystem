@@ -5,8 +5,6 @@ import pandas as pd
 import joblib
 import os
 import sys
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
 from datetime import datetime, timedelta
 
 # Ensure "Scripts/" is in the Python module search path
@@ -21,7 +19,7 @@ from utils import read_and_preprocess_data, preprocess_stock_data
 # Define API Keys
 SIMFIN_API_KEY = "33cd76b1-b978-4165-8b91-5696ddea452a"
 
-# Initialize API Clients
+# Initialize APIs
 simfin_client = PySimFin(SIMFIN_API_KEY)
 
 #Load stock data (Historical data for graph)
@@ -54,19 +52,37 @@ st.subheader("📑 Financial Statements")
 statement_type = st.selectbox("Select Financial Statement:", ["Profit & Loss (PL)", "Balance Sheet (BS)", "Cash Flow (CF)", "Derived Ratios (DERIVED)"])
 statement_code = {"Profit & Loss (PL)": "PL", "Balance Sheet (BS)": "BS", "Cash Flow (CF)": "CF", "Derived Ratios (DERIVED)": "DERIVED"}[statement_type]
 
+##**Date Range Selection**
+col1, col2 = st.columns(2)
+
+with col1:
+    start_date = st.date_input("Start Date", datetime.today() - timedelta(days=730))  # Default: 2 years ago
+
+with col2:
+    end_date = st.date_input("End Date", datetime.today())  # Default: Today
+
+# Ensure dates are formatted correctly
+start_date = start_date.strftime("%Y-%m-%d")
+end_date = end_date.strftime("%Y-%m-%d")
+
 if st.button("Fetch Financial Data"):
-    st.write(f"Fetching {statement_type} for {ticker}...")
+    st.write(f"Fetching {statement_type} for {ticker} from {start_date} to {end_date}...")
 
-    # Define date range (last 2 years)
-    end_date = datetime.today().strftime("%Y-%m-%d")
-    start_date = (datetime.today() - timedelta(days=730)).strftime("%Y-%m-%d")
-
+    # Fetch financial data
     financial_data = simfin_client.get_financial_statement(ticker, statement_code, start_date, end_date)
 
+     #Si hay datos, filtramos solo las columnas necesarias
     if not financial_data.empty:
-        st.dataframe(financial_data.head(10))
+        useful_columns = ["name", "ticker", "currency", "statement_type", "Fiscal Period", "Fiscal Year", 
+                  "total_assets", "total_liabilities", "shareholder_equity"]
+        
+        # Filtrar solo las columnas que existen en los datos
+        financial_data = financial_data[[col for col in useful_columns if col in financial_data.columns]]
+
+        # Mostrar los datos limpios en Streamlit
+        st.dataframe(financial_data)
     else:
-        st.warning(f"⚠ No data available for {statement_type}.")
+        st.warning(f"⚠ No data available for {statement_type} in the selected date range.")
 
 ##PREDICTION
 # STREAMLIT APP
@@ -83,14 +99,4 @@ if st.button("Predict Stock Movement"):
         prediction = company.predict_next_day()
         if prediction:
             st.subheader(f"📈 Prediction for {ticker}: {prediction}")
-
-
-##
-#MORE INFO
-st.title("More Info")
-if st.button("Predict Stock Movement"):
-    st.write(f"### Predicting for {ticker}...")
-
-    company_info = PySimFin("33cd76b1-b978-4165-8b91-5696ddea452a")
-    company_info.get_financial_statement()
 
