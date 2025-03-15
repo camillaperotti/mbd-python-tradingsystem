@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 
 def main():
     st.set_page_config(
@@ -7,23 +8,38 @@ def main():
         layout="wide"
     )
 
-    # Logo
+    # 🔹 Correct the path to the 'images' folder (move up one level)
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Get the directory of this script
+    IMAGE_DIR = os.path.join(BASE_DIR, "images")  # Ensure it finds 'App/images/' correctly
+
+    # Debugging - Check if the images folder exists
+    #if not os.path.exists(IMAGE_DIR):
+        #st.error(f"🚨 Folder not found: {IMAGE_DIR}")
+    #else:
+       # st.write("✅ Found 'images/' folder:", IMAGE_DIR)
+       # st.write("📂 Files in 'images' folder:", os.listdir(IMAGE_DIR))
+
+    # Logo Section
     col_logo, col_text = st.columns([1, 3])
     with col_logo:
-        st.image("App/images/logo_w.png", width=300)  
+        logo_path = os.path.join(IMAGE_DIR, "logo_w.png")  # 🔹 Use absolute path
+
+        if os.path.exists(logo_path):  # 🔹 Ensure the logo exists before displaying
+            st.image(logo_path, width=300)
+        else:
+            st.error(f"❌ Logo not found: {logo_path}")
+
     with col_text:
         st.markdown("<br>", unsafe_allow_html=True)  
-    
+
     # Main Content
-    #INTRO
-    ##
     st.markdown("""
     ### Data-driven Financial Advisors 💡
     Welcome to **DataRock**, a platform for **data-driven financial advisory**.  
     We provide **advanced market insights and predictive analytics** for **brokers and individual investors**,  
     helping you make informed trading decisions using **machine learning and financial modeling**.
     """)
-    
+
     st.markdown("---")  # Separator for clarity
 
     st.write("""
@@ -39,7 +55,6 @@ def main():
 
     By incorporating companies from diverse industries, this application offers a well-rounded perspective on market movements, helping users navigate stock trading with greater confidence.
     """)
-             
 
     st.write("""
     **Group 2 Python Project:** Trading system for selected US companies.
