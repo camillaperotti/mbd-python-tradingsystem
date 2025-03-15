@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 
 # Team Organization Page
 st.title("Team Organization 👨‍💼👩‍💼")
@@ -31,9 +32,21 @@ team_members = [
 # Display team members in a 4-column layout
 cols = st.columns(4)
 
+#for i, member in enumerate(team_members):
+   # with cols[i]:
+        #st.image(member["image"], caption=member["name"])
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+IMAGE_DIR = os.path.join(BASE_DIR, "images")
+
 for i, member in enumerate(team_members):
+    image_path = os.path.join(IMAGE_DIR, os.path.basename(member['image']))
+    
+    if not os.path.exists(image_path):
+        st.warning(f"⚠️ Image not found: {image_path}")  # Debugging message
+    
     with cols[i]:
-        st.image(member["image"], caption=member["name"])
+        st.image(image_path, caption=member["name"])
         
 # Footer
 st.markdown("---")
