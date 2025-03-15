@@ -32,7 +32,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__f
 
 # Import custom scripts
 from Scripts.API import PySimFin
-from Scripts.API import NewsAPI
+#from Scripts.API import NewsAPI
 from Scripts.Exceptions import SimFinError, ResourceNotFoundError
 from Scripts.predict import Prediction
 from utils import read_and_preprocess_data, preprocess_stock_data
@@ -178,33 +178,33 @@ if st.button("Predict Stock Movement"):
 
 
 ##NEWS
-NEWS_API_KEY = "9e47d5c4e7374f29a69f83554ed9c6b9"  # actual API key
-news_client = NewsAPI(NEWS_API_KEY)
+#NEWS_API_KEY = "9e47d5c4e7374f29a69f83554ed9c6b9"  # actual API key
+#news_client = NewsAPI(NEWS_API_KEY)
 
 # Map tickers to full company names for the NewsAPI
-ticker_to_company = {
-    "AAPL": "Apple",
-    "MSFT": "Microsoft",
-    "TSLA": "Tesla",
-    "ABT": "Abbott",
-    "BRKR": "Bruker"
-}
+#ticker_to_company = {
+ #   "AAPL": "Apple",
+  #  "MSFT": "Microsoft",
+   # "TSLA": "Tesla",
+   # "ABT": "Abbott",
+    #"BRKR": "Bruker"
+#}
 
 # 📰 STOCK MARKET NEWS SECTION
-st.subheader(f"📰 Latest News on {company_name}")
+#st.subheader(f"📰 Latest News on {company_name}")
 
 # Get the company name for the API request
-company_for_news = ticker_to_company.get(ticker, ticker)  # Default to ticker if not found
+#company_for_news = ticker_to_company.get(ticker, ticker)  # Default to ticker if not found
 
 # Define date range (fetch last 7 days of news)
-news_from_date = (datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d")
+#news_from_date = (datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d")
 
 # Fetch news using NewsAPI
-news_df = news_client.get_news(company_for_news, news_from_date)
+#news_df = news_client.get_news(company_for_news, news_from_date)
 
 # Display the news articles
-if not news_df.empty:
-    for i, row in news_df.iterrows():
-        st.markdown(f"**[{row['title']}]({row['url']})** *(via {row['name']}, {row['publishedAt'][:10]})*")
-else:
-    st.warning(f"⚠ No recent news available for {company_name}.")
+#if not news_df.empty:
+#    for i, row in news_df.iterrows():
+#        st.markdown(f"**[{row['title']}]({row['url']})** *(via {row['name']}, {row['publishedAt'][:10]})*")
+#else:
+#    st.warning(f"⚠ No recent news available for {company_name}.")
