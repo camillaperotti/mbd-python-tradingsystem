@@ -8,18 +8,18 @@ import os
 import sys
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from API import PySimFin
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))) ## mac: _init_, windows: __init__
+from Scripts.API import PySimFin
 from datetime import datetime, timedelta
 
 class Prediction:
-    def __init__(self, ticker):
+    def __init__(self, ticker): ## mac: _init_, windows: __init__
         self.ticker = ticker
         self.ticker_data = None
         self.model = None
         self.scaler = None
-        self.model_path = f"models/model_{self.ticker}.pkl"
-        self.scaler_path = f"models/scaler_{self.ticker}.pkl"
+        self.model_path = f"Scripts/models/model_{self.ticker}.pkl" ##path changed
+        self.scaler_path = f"Scripts/models/scaler_{self.ticker}.pkl" ##path changed
 
     def load_api(self):
         simfin = PySimFin("33cd76b1-b978-4165-8b91-5696ddea452a")
