@@ -1,4 +1,21 @@
 import pandas as pd
+import os
+import argparse
+import logging
+
+# Configure logging to show all messages and include timestamp
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+# Get the script's directory
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Default paths (relative to script location)
+default_raw_data_path = os.path.join(base_dir, "ETL", "data", "us-shareprices-daily.csv")
+default_output_path = os.path.join(base_dir, "pricesbruker_output.csv")
+
 
 def load_data(filepath):
     # Load data
@@ -23,16 +40,16 @@ def process_data(prices_bruker):
     
 def save_data(prices_bruker, output_filepath):
     prices_bruker.to_csv(output_filepath)
-    print(f"Processed data saved to {output_filepath}")
+    logging.info(f"Processed data saved to {output_filepath}")
 
 def etl_pipeline(filepath, output_filepath):
     # Extract
     prices_bruker = load_data(filepath)
-    print(f"Data loaded from {filepath}")
+    logging.info(f"Data loaded from {filepath}")
     
     # Transform
     prices_bruker = process_data(prices_bruker)
-    print("Data processed successfully")
+    logging.info("Data processed successfully")
     
     # Load
     save_data(prices_bruker, output_filepath)
@@ -41,9 +58,9 @@ def etl_pipeline(filepath, output_filepath):
 
 
 if __name__ == "__main__":
-    # raw data file
-    filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/data/us-shareprices-daily.csv"
-    # clean data file
-    output_filepath = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/pricesbruker_output.csv"
+    parser = argparse.ArgumentParser(description="Run ETL for Bruker stock data")
+    parser.add_argument("--raw_data", type=str, default=default_raw_data_path, help="Path to raw data CSV file")
+    parser.add_argument("--output_data", type=str, default=default_output_path, help="Path to save processed data")
+    args = parser.parse_args()
 
-    etl_pipeline(filepath, output_filepath)
+    etl_pipeline(args.raw_data, args.output_data)
