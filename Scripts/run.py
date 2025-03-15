@@ -37,6 +37,7 @@ class Company:
         # Load full dataset and filter only relevant 5 companies
         prices_all = pd.read_csv(filepath, delimiter=';')
         prices = prices_all[prices_all["SimFinId"].isin([1253240, 111052, 63877, 56317, 59265])]
+        logging.info(f"Successfully loaded dataframe prices for 5 selected companies.")
         return prices
 
     def process_data(self, prices):
@@ -44,22 +45,23 @@ class Company:
         prices["Dividend"] = prices["Dividend"].fillna(0)
         prices["Shares Outstanding"] = prices["Shares Outstanding"].astype(int)
         prices["Date"] = pd.to_datetime(prices["Date"], format="%Y-%m-%d")
+        logging.info(f"Successfully cleaned dataframe prices for 5 selected companies.")
         return prices
     
     def save_data(self, prices, output_filepath):
         prices.to_csv(output_filepath, index=False)
-        print(f"Processed data saved to {output_filepath}")
+        logging.info(f"Successfully saved processed data to {output_filepath}")
 
     def etl_pipeline(self, filepath, output_filepath):
         # Run the ETL pipeline (Extract, Transform, Load)
-        print(f"Starting ETL for {self.ticker}...")
+        logging.debug(f"Starting ETL for {self.ticker}...")
         self.prices = self.load_data(filepath)
         self.prices = self.process_data(self.prices)
         self.save_data(self.prices, output_filepath)
-        print("ETL Completed!\n")
+        logging.info(f"ETL Completed!\n")
 
     def prepare_data(self):
-        print(f"Preparing data for {self.ticker} for ML")
+        logging.debug(f"Preparing data for {self.ticker} for ML")
 
         # Filter for the current ticker only
         prices = self.prices[self.prices["Ticker"] == self.ticker]
@@ -86,11 +88,11 @@ class Company:
         
         # Save processed prices
         self.prices = prices  
-        print("Data preparation for ML completed!\n")
+        logging.info(f"Data preparation for ML completed!\n")
 
     def train_model(self):
         # Logistic Regression model
-        print(f"Training model for {self.ticker}...")
+        logging.debug(f"Training model for {self.ticker}...")
 
         # Define features and target
         X = self.prices.drop(columns=["Ticker", "Date", "Price_Up"])
@@ -110,33 +112,35 @@ class Company:
         # Evaluate
         y_pred = self.model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
-        print(f"Accuracy for {self.ticker}: {accuracy:.4f}\n")
+        logging.info(f"Accuracy for {self.ticker}: {accuracy:.4f}\n")
 
         # Save model and scaler
         joblib.dump(self.model, self.model_path)
         joblib.dump(self.scaler, self.scaler_path)
 
-        print(f"Model saved at {self.model_path}")
-        print(f"Scaler saved at {self.scaler_path}\n")
+        logging.info(f"Model saved at {self.model_path}")
+        logging.info(f"Scaler saved at {self.scaler_path}\n")
 
     def load_model(self):
         # Load trained model and scaler for this ticker
         if not os.path.exists(self.model_path) or not os.path.exists(self.scaler_path):
+            logging.error(f"Model or Scaler for {self.ticker} not found. Train the model first.")
             raise FileNotFoundError("Model or Scaler not found. Train the model first.")
 
         self.model = joblib.load(self.model_path)
         self.scaler = joblib.load(self.scaler_path)
-        print(f"Model and scaler for {self.ticker} loaded successfully!\n")
+        logging.info(f"Model and scaler for {self.ticker} loaded successfully!\n")
 
     def predict_next_day(self):
         # Make a prediction for the next day's price movement
         if self.model is None or self.scaler is None:
+            logging.error(f"Model or Scaler for {self.ticker} not loaded. Run load_model() first.")
             raise ValueError("Model and scaler not loaded. Run load_model() first.")
 
         # Use the last available row for prediction
         latest_features = self.prices.iloc[-1:].drop(columns=["Price_Up", "Date","Ticker"])
         latest_features_scaled = self.scaler.transform(latest_features)
-
+        logging.info(f"Features used for {self.ticker} prediction: {latest_features.values}")
         prediction = self.model.predict(latest_features_scaled)
         return "UP" if prediction[0] == 1 else "DOWN"
 
@@ -154,7 +158,7 @@ if __name__ == "__main__":
     raw_data_path = os.path.join(base_dir, "ETL", "data", "us-shareprices-daily.csv")
     processed_data_path = os.path.join(base_dir, "ETL", "pricesbruker_output.csv")
 
-    print(f"\n========== Running for {args.ticker} ==========\n")
+    logging.debug(f"========== Running for {args.ticker} ==========")
     company = Company(args.ticker)
 
     # Run ETL
@@ -167,4 +171,4 @@ if __name__ == "__main__":
     # Load and predict
     company.load_model()
     prediction = company.predict_next_day()
-    print(f"Predicted movement for {args.ticker}: {prediction}\n")
+    logging.info(f"Predicted movement for {args.ticker}: {prediction}\n")

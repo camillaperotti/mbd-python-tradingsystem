@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import argparse
+import logging
 
 # Get the script's directory
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -9,6 +10,11 @@ base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 raw_data_path = os.path.join(base_dir, "ETL", "data", "us-shareprices-daily.csv")
 processed_data_path = os.path.join(base_dir, "ETL", "pricesbruker_output.csv")
 
+# Configure logging to show all messages and include timestamp
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 def load_data(filepath):
     # Load data
@@ -33,16 +39,16 @@ def process_data(prices_bruker):
     
 def save_data(prices_bruker, output_filepath):
     prices_bruker.to_csv(output_filepath)
-    print(f"Processed data saved to {output_filepath}")
+    logging.info(f"Processed data saved to {output_filepath}")
 
 def etl_pipeline(filepath, output_filepath):
     # Extract
     prices_bruker = load_data(filepath)
-    print(f"Data loaded from {filepath}")
+    logging.info(f"Data loaded from {filepath}")
     
     # Transform
     prices_bruker = process_data(prices_bruker)
-    print("Data processed successfully")
+    logging.info("Data processed successfully")
     
     # Load
     save_data(prices_bruker, output_filepath)
