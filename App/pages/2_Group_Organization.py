@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 
+
+
 # Team Organization Page
 st.title("Team Organization 👨‍💼👩‍💼")
 
@@ -40,3 +42,13 @@ for i, member in enumerate(team_members):
 st.markdown("---")
 st.markdown("📢 *Thank you for visiting our team page!*")
 
+# Debugging file paths
+st.write("📂 Current Working Directory:", os.getcwd())
+st.write("📂 Files in Root:", os.listdir("."))
+st.write("📂 Files in 'images' folder:", os.listdir("images") if os.path.exists("images") else "🚨 Folder not found!")
+
+# Check image file existence
+for member in team_members:
+    image_path = os.path.join("images", os.path.basename(member["image"]))
+    if not os.path.exists(image_path):
+        st.warning(f"⚠️ Image not found: {image_path}")
