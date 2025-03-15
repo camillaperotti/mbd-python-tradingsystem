@@ -8,6 +8,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
+# Get the script's directory
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Default paths (relative to script location)
+default_raw_data_path = os.path.join(base_dir, "ETL", "data", "us-shareprices-daily.csv")
+default_output_path = os.path.join(base_dir, "pricesbruker_output.csv")
+
 class Company:
     def __init__(self, ticker):
         
@@ -131,21 +138,18 @@ if __name__ == "__main__":
     parser.add_argument("ticker", type=str, help="Stock ticker symbol to process (e.g., AAPL, TSLA)")
     args = parser.parse_args()
 
-    # File paths
-    raw_data_path = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/data/us-shareprices-daily.csv"
-    processed_data_path = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/prices_output.csv"
 
-    print(f"\n========== Running for {args.ticker} ==========\n")
-    company = Company(args.ticker)
+print(f"\n========== Running for {args.ticker} ==========\n")
+company = Company(args.ticker)
 
-    # Run ETL
-    company.etl_pipeline(raw_data_path, processed_data_path)
+# Run ETL
+company.etl_pipeline(default_raw_data_path, default_output_path)
 
-    # Prepare and train model
-    company.prepare_data()
-    company.train_model()
+# Prepare and train model
+company.prepare_data()
+company.train_model()
 
-    # Load and predict
-    company.load_model()
-    prediction = company.predict_next_day()
-    print(f"Predicted movement for {args.ticker}: {prediction}\n")
+# Load and predict
+company.load_model()
+prediction = company.predict_next_day()
+print(f"Predicted movement for {args.ticker}: {prediction}\n")
