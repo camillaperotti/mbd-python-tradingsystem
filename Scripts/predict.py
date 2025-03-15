@@ -18,8 +18,8 @@ class Prediction:
         self.ticker_data = None
         self.model = None
         self.scaler = None
-        self.model_path = f"Scripts/models/model_{self.ticker}.pkl" ##path changed
-        self.scaler_path = f"Scripts/models/scaler_{self.ticker}.pkl" ##path changed
+        self.model_path = f"models/model_{self.ticker}.pkl" ##path changed
+        self.scaler_path = f"models/scaler_{self.ticker}.pkl" ##path changed
 
     def load_api(self):
         simfin = PySimFin("33cd76b1-b978-4165-8b91-5696ddea452a")
