@@ -1,3 +1,23 @@
+import os
+import streamlit as st
+
+st.subheader("🔍 Debugging Model Paths")
+
+# Print current working directory
+cwd = os.getcwd()
+st.write(f"**Current Working Directory:** `{cwd}`")
+
+# List all files in the project root
+st.write("**Files in Root Directory:**", os.listdir("."))
+
+# Check if 'Scripts/models' directory exists
+models_path = "Scripts/models"
+if os.path.exists(models_path):
+    st.write(f"**Files in '{models_path}':**", os.listdir(models_path))
+else:
+    st.error(f"🚨 Folder '{models_path}' not found! Your models might not be deployed.")
+
+
 ##Ensuring Python Uses the Project’s utils.py Instead of site-packages. As well as Scripts
 import sys
 import os
