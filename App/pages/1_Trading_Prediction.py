@@ -178,8 +178,8 @@ if st.button("Predict Stock Movement"):
 
 
 ##NEWS
-#NEWS_API_KEY = "9e47d5c4e7374f29a69f83554ed9c6b9"  # actual API key
-news_client = NewsAPI("9e47d5c4e7374f29a69f83554ed9c6b9")
+NEWS_API_KEY = "9e47d5c4e7374f29a69f83554ed9c6b9"  # actual API key
+news_client = NewsAPI(NEWS_API_KEY)
 
 # Map tickers to full company names for the NewsAPI
 ticker_to_company = {
