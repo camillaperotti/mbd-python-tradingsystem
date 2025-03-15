@@ -162,7 +162,7 @@ class NewsAPI:
     base_url = 'https://newsapi.org/v2/everything'
 
     #Initialize the API wrapper with the provided API key
-    def _init_(self, api_key):
+    def __init__(self, api_key):
         self.api_key = api_key
 
         # Configure logging
