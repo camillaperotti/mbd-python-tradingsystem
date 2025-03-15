@@ -109,38 +109,69 @@ with col2:
 start_date = start_date.strftime("%Y-%m-%d")
 end_date = end_date.strftime("%Y-%m-%d")
 
+# Fetch financial data only when the button is clicked
+if "financial_data" not in st.session_state:
+    st.session_state.financial_data = None  # Initialize session state
+
 if st.button("Fetch Financial Data"):
     st.write(f"Fetching {statement_type} for {ticker} from {start_date} to {end_date}...")
 
-    # Fetch financial data
+    # Retrieve financial data and store it in session state
     financial_data = simfin_client.get_financial_statement(ticker, statement_code, start_date, end_date)
 
-     #Si hay datos, filtramos solo las columnas necesarias
     if not financial_data.empty:
-        useful_columns = ["name", "ticker", "currency", "statement_type", "Fiscal Period", "Fiscal Year", 
-                  "total_assets", "total_liabilities", "shareholder_equity"]
-        
-        # Filtrar solo las columnas que existen en los datos
-        financial_data = financial_data[[col for col in useful_columns if col in financial_data.columns]]
-
-        # Mostrar los datos limpios en Streamlit
-        st.dataframe(financial_data)
+        st.session_state.financial_data = financial_data  # Store data persistently
     else:
         st.warning(f"⚠ No data available for {statement_type} in the selected date range.")
 
+# **Ensure financial data persists after fetching**
+if st.session_state.financial_data is not None:
+    st.subheader("📊 Full Financial Data View")
+    st.write("Displaying all columns for reference.")
+    st.dataframe(st.session_state.financial_data)  # Show full dataset initially
+
+    # **Step 2: Allow User to Select Columns**
+    st.subheader("📌 Select Relevant Columns to Display")
+    all_columns = st.session_state.financial_data.columns.tolist()  # Get all available columns
+
+    # Ensure user can select columns (default selects first 6 columns)
+    selected_columns = st.multiselect("Choose which columns to display:", all_columns, default=all_columns[:6])
+
+    # **Step 3: Display Filtered Dataframe**
+    if selected_columns:  # Ensure at least one column is selected
+        financial_data_filtered = st.session_state.financial_data[selected_columns]  # Filter data
+
+        st.subheader("📈 Filtered Financial Data")
+        st.write("Showing selected columns:")
+        st.dataframe(financial_data_filtered)  # Display updated dataframe
+    else:
+        st.warning("⚠ Please select at least one column to display.")
+
 ##PREDICTION
-# STREAMLIT APP
-st.title("📊 Stock Price Movement Predictor")
+st.subheader("💡Stock Price Movement Predictor")
 
 if st.button("Predict Stock Movement"):
-    st.write(f"### Predicting for {ticker}...")
-
     company = Prediction(ticker)
     company.load_api()
     company.transform_data()
 
     if company.load_model():
         prediction = company.predict_next_day()
-        if prediction:
-            st.subheader(f"📈 Prediction for {ticker}: {prediction}")
+        
+        if prediction:  # Ensure a valid result
+            # Define strategy based on prediction
+            if prediction == "UP":
+                emoji = "📈"
+                action = "**BUY** ✅"
+                message = f"**{emoji} {ticker} is predicted to go UP tomorrow!**"
+                strategy = f"Recommended strategy: {action} (Expecting price increase)"
+            else:  # If "DOWN"
+                emoji = "📉"
+                action = "**SELL** ❌"
+                message = f"**{emoji} {ticker} is predicted to go DOWN tomorrow.**"
+                strategy = f"Recommended strategy: {action} (Minimize potential losses)"
+
+            # Display simplified prediction result
+            st.markdown(message)
+            st.markdown(strategy)
 
