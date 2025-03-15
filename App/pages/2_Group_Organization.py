@@ -1,7 +1,8 @@
 import streamlit as st
 import os
+import sys
 
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Team Organization Page
 st.title("Team Organization 👨‍💼👩‍💼")
@@ -41,7 +42,7 @@ for member in team_members:
     image_path = os.path.join("images", os.path.basename(member["image"]))
     if not os.path.exists(image_path):
         st.warning(f"⚠️ Image not found: {image_path}")
-        
+
 # Display team members in a 4-column layout
 cols = st.columns(4)
 
