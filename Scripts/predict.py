@@ -25,7 +25,7 @@ class Prediction:
         simfin = PySimFin("33cd76b1-b978-4165-8b91-5696ddea452a")
 
         end_date = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-        start_date = (datetime.today() - timedelta(days=8)).strftime("%Y-%m-%d")
+        start_date = (datetime.today() - timedelta(days=14)).strftime("%Y-%m-%d")
 
         self.ticker_data = simfin.get_share_prices(self.ticker, start_date, end_date)
 

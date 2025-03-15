@@ -19,7 +19,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-class PredictionT:
+class Prediction:
     def __init__(self, ticker):
         self.ticker = ticker
         self.ticker_data = None #so we can refer to it easily
@@ -34,7 +34,7 @@ class PredictionT:
         
         # Get today's date and compute the date range
         end_date = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")  # Yesterday's date
-        start_date = (datetime.today() - timedelta(days=14)).strftime("%Y-%m-%d")  # 14 days ago, to have enough data to not have any null values
+        start_date = (datetime.today() - timedelta(days=8)).strftime("%Y-%m-%d")  # 8 days ago, to have enough data to not have any null values
 
         # Fetch share prices for the past week
         self.ticker_data = simfin.get_share_prices(self.ticker, start_date, end_date)
@@ -59,11 +59,11 @@ class PredictionT:
         # Drop "Date" and "Ticker"
         self.ticker_data = self.ticker_data.drop(columns=["Ticker","Date"])
         logging.info(f"Data transformation complete for {self.ticker} - ready for prediction.")
-
+        
     def load_model(self):
         # Load trained model and scaler for this ticker
         if not os.path.exists(self.model_path) or not os.path.exists(self.scaler_path):
-            logging.error(f"Model or Scaler not found. Train the model first.")
+            logging.error(f"Model or Scaler not found. Train the model first ")
             raise FileNotFoundError("Model or Scaler not found.")
 
         self.model = joblib.load(self.model_path)
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logging.debug(f"========== Predicting for {args.ticker} ==========\n")
-    company = PredictionT(args.ticker)
+    company = Prediction(args.ticker)
 
     # Load api
     company.load_api()
@@ -104,3 +104,4 @@ if __name__ == "__main__":
     company.load_model()
     prediction = company.predict_next_day()
     logging.info(f"Predicted movement for {args.ticker}: {prediction}\n")
+
