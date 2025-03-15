@@ -1,3 +1,13 @@
+#Web-page configuration
+import streamlit as st
+
+# Set the page title and favicon (must be at the very top)
+st.set_page_config(
+    page_title="Trading Prediction - DataRock",
+    page_icon="📈",
+    layout="wide"
+)
+
 ##Ensuring Python Uses the Project’s utils.py Instead of site-packages. As well as Scripts
 import sys
 import os
@@ -6,7 +16,6 @@ import os
 from utils import read_and_preprocess_data, preprocess_stock_data
 ##
 
-import streamlit as st
 import plotly.express as px
 import numpy as np
 import pandas as pd
@@ -44,18 +53,42 @@ st.sidebar.header("📌 Stock Market Selection")
 tickers_in_data = sorted(set(data["Ticker"].unique()) & set(allowed_tickers))  # Ensure only available tickers are shown
 ticker = st.sidebar.selectbox("Select a stock:", tickers_in_data)
 
-# COMPANY STOCKS
+# Define mapping of tickers to company names
+company_names = {
+    "AAPL": "Apple Inc",
+    "MSFT": "Microsoft Corp",
+    "TSLA": "Tesla Inc",
+    "ABT": "Abbott Laboratories",
+    "BRKR": "Bruker Corp"
+}
+
+# Get the full company name (default to ticker if not found)
+company_name = company_names.get(ticker, ticker)
+
+##COMPANY STOCKS##
+# Display the company name as the main title
+st.title(f"{company_name} Stock Analysis")
+
 # Show Latest Stock Data
 st.subheader(f"📊 Latest Historical Data for {ticker}")
 data_ticker = preprocess_stock_data(data, ticker)
 
 #GRAPH, Historical data
 # Stock Price Evolution Graph
+# Stock Price Evolution Graph with optimized dark theme
 fig = px.line(data_ticker, x="Date", y="Close", 
-              title=f"{ticker} Price Evolution - Historical Data", template="none")
-fig.update_xaxes(title="Date")
-fig.update_yaxes(title="Closing Price")
-st.plotly_chart(fig, use_container_width=True)
+              title=f"{ticker} Price Evolution - Historical Data", template="plotly_dark")
+# Customize background to match dark UI
+fig.update_layout(
+    plot_bgcolor="rgba(30,30,30,0.9)",  # Dark gray background for the graph
+    paper_bgcolor="rgba(30,30,30,0.9)",  # Dark gray background for the entire figure
+    font=dict(color="white")  # Ensure text is visible on dark mode
+)
+# Update axes for clarity
+fig.update_xaxes(title="Date", showgrid=True, gridcolor="rgba(255,255,255,0.2)")  # Subtle grid lines
+fig.update_yaxes(title="Closing Price", showgrid=True, gridcolor="rgba(255,255,255,0.2)")
+# Display the final graph
+st.plotly_chart(fig)
 
 ###FINANCIAL STATEMENTS
 st.subheader("📑 Financial Statements")
