@@ -19,7 +19,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-class PredictionT:
+class Prediction:
     def __init__(self, ticker):
         self.ticker = ticker
         self.ticker_data = None #so we can refer to it easily
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logging.debug(f"========== Predicting for {args.ticker} ==========\n")
-    company = PredictionT(args.ticker)
+    company = Prediction(args.ticker)
 
     # Load api
     company.load_api()
