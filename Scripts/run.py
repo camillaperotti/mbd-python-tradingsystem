@@ -18,8 +18,13 @@ class Company:
         self.prices = None  # Data will be assigned later after ETL
         self.model = None
         self.scaler = None
-        self.model_path = f"models/model_{self.ticker}.pkl"
-        self.scaler_path = f"models/scaler_{self.ticker}.pkl"
+
+        # Get the script's directory
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        # Default paths (relative to script location)
+        self.model_path = os.path.join(base_dir, "Scripts", "models", f"model_{self.ticker}.pkl")
+        self.scaler_path = os.path.join(base_dir, "Scripts", "models", f"scaler_{self.ticker}.pkl")
 
     def load_data(self, filepath):
         # Load full dataset and filter only relevant 5 companies

@@ -10,7 +10,7 @@ def main():
     # Logo
     col_logo, col_text = st.columns([1, 3])
     with col_logo:
-        st.image("App/images/logo_w.png", width=300)  
+        st.image("images/logo_w.png", width=300)  
     with col_text:
         st.markdown("<br>", unsafe_allow_html=True)  
     

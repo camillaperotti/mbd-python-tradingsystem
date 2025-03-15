@@ -2,16 +2,6 @@
 import sys
 import os
 
-# Get the absolute path of the project root
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-
-# Ensure "Scripts/" is in the module search path
-sys.path.append(ROOT_DIR)  # Add the project root
-sys.path.append(os.path.join(ROOT_DIR, "Scripts"))  # Add the Scripts folder
-
-# Debugging: Print Python paths
-print("UPDATED PYTHON PATHS:", sys.path)
-
 #Now import utils from App/
 from utils import read_and_preprocess_data, preprocess_stock_data
 ##
@@ -25,8 +15,8 @@ import os
 import sys
 from datetime import datetime, timedelta
 
-# Ensure "Scripts/" is in the Python module search path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))) ## mac: _init_, windows: __init__
+# Go to 'MBD-Python-Trading System'
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))) ## mac: _init_, windows: __init__
 
 ##
 

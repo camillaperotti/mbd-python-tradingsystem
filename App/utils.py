@@ -3,7 +3,9 @@ import pandas as pd
 import numpy as np
 import joblib
 from sklearn.preprocessing import StandardScaler
-
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))) ## mac: _init_, windows: __init__
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -14,7 +16,12 @@ def read_and_preprocess_data() -> pd.DataFrame:
     Loads and preprocesses stock market data from the consolidated CSV file.
     Returns a Pandas DataFrame.
     """
-    csv_path = "ETL/prices_output.csv"
+    # Get the script's directory
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Default paths (relative to script location)
+    csv_path = os.path.join(base_dir, "ETL", "prices_output.csv")
+
     return pd.read_csv(csv_path)
 
 def load_model_and_scaler(ticker) -> tuple:

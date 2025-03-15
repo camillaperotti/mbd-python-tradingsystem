@@ -15,16 +15,16 @@ st.subheader("Meet Our Team")
 
 # Team Members Data (with correct image paths)
 team_members = [
-    {"name": "Camilla Perotti", "role": "Project Manager & ML Engineer", "image": "App/images/camilla.jpg",
+    {"name": "Camilla Perotti", "role": "Project Manager & ML Engineer", "image": "images/camilla.jpg",
      "description": "Oversaw the project, ensuring collaboration and value creation. Led the ETL process and designed scalable data pipelines."},
     
-    {"name": "Lucía Sarobe", "role": "ML Engineer & Model Integration", "image": "App/images/lucia.jpg",
+    {"name": "Lucía Sarobe", "role": "ML Engineer & Model Integration", "image": "images/lucia.jpg",
      "description": "Developed and optimized the logistic regression model, ensuring smooth integration into the trading app."},
     
-    {"name": "Tomás Silva", "role": "Data Engineer & API Development", "image": "App/images/tomas.jpg",
+    {"name": "Tomás Silva", "role": "Data Engineer & API Development", "image": "images/tomas.jpg",
      "description": "Designed and implemented the API layer to fetch real-time stock and financial news data for precise model predictions."},
     
-    {"name": "Héctor Marmol", "role": "Web Developer & Deployment Lead", "image": "App/images/hector.jpg",
+    {"name": "Héctor Marmol", "role": "Web Developer & Deployment Lead", "image": "images/hector.jpg",
      "description": "Developed the interactive Streamlit interface and managed app deployment for an intuitive user experience."},
 ]
 
@@ -33,7 +33,7 @@ cols = st.columns(4)
 
 for i, member in enumerate(team_members):
     with cols[i]:
-        st.image(member["image"], caption=member["name"], use_container_width=True)
+        st.image(member["image"], caption=member["name"])
         
 # Footer
 st.markdown("---")
