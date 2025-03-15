@@ -167,7 +167,7 @@ class NewsAPI:
 
         # Configure logging
         logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-        self.logger = logging.getLogger(_name_)
+        self.logger = logging.getLogger(__name__)
 
     #Method to fetch data from the SimFin API
     def get_data(self, params: dict):
