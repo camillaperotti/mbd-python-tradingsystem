@@ -12,7 +12,7 @@ sys.path.append(os.path.join(ROOT_DIR, "Scripts"))  # Add the Scripts folder
 # Debugging: Print Python paths
 print("UPDATED PYTHON PATHS:", sys.path)
 
-# ✅ Now import utils from App/
+#Now import utils from App/
 from utils import read_and_preprocess_data, preprocess_stock_data
 ##
 
@@ -50,7 +50,7 @@ data = read_and_preprocess_data()
 allowed_tickers = ["AAPL", "ABT", "BRKR", "MSFT", "TSLA"]
 
 ##SIDEBAR: Stock Selection (Only Your 5 Tickers)
-st.sidebar.header("Stock Market Selection")
+st.sidebar.header("📌 Stock Market Selection")
 tickers_in_data = sorted(set(data["Ticker"].unique()) & set(allowed_tickers))  # Ensure only available tickers are shown
 ticker = st.sidebar.selectbox("Select a stock:", tickers_in_data)
 
@@ -67,7 +67,7 @@ fig.update_xaxes(title="Date")
 fig.update_yaxes(title="Closing Price")
 st.plotly_chart(fig, use_container_width=True)
 
-### 📑 FINANCIAL STATEMENTS
+###FINANCIAL STATEMENTS
 st.subheader("📑 Financial Statements")
 
 statement_type = st.selectbox("Select Financial Statement:", ["Profit & Loss (PL)", "Balance Sheet (BS)", "Cash Flow (CF)", "Derived Ratios (DERIVED)"])
