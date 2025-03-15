@@ -80,7 +80,7 @@ class PredictionT:
         latest_features = self.ticker_data.iloc[-1:]
         latest_features_scaled = self.scaler.transform(latest_features)
 
-        logging.debug(f"Features used for {self.ticker} prediction: {latest_features.values}")
+        logging.info(f"Features used for {self.ticker} prediction: {latest_features.values}")
 
         prediction = self.model.predict(latest_features_scaled)
         return "UP" if prediction[0] == 1 else "DOWN"
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument("ticker", type=str, help="Stock ticker symbol to process (e.g., AAPL, TSLA)")
     args = parser.parse_args()
 
-    logging.debug(f"========== Predicting for {args.ticker} ==========\n")
+    logging.debug(f"========== Predicting for {args.ticker} ==========")
     company = PredictionT(args.ticker)
 
     # Load api

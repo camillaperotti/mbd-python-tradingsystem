@@ -68,7 +68,7 @@ class Prediction:
 
         latest_features = self.ticker_data.iloc[-1:]
         latest_features_scaled = self.scaler.transform(latest_features)
-        logging.debug(f"Features used for {self.ticker} prediction: {latest_features.values}")
+        logging.info(f"Features used for {self.ticker} prediction: {latest_features.values}")
         prediction = self.model.predict(latest_features_scaled)
 
         return "UP" if prediction[0] == 1 else "DOWN"

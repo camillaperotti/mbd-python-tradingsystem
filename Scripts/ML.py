@@ -7,6 +7,13 @@ from sklearn.metrics import accuracy_score
 import seaborn as sns
 import joblib
 import os
+import logging
+
+# Configure logging to show all messages and include timestamp
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 # Get the script's directory
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +73,7 @@ def train_model(x_train_scaled, y_train, model_path, sc):
     # Save trained model and scaler
     joblib.dump(classifier, model_path)
     joblib.dump(sc, model_path.replace("models/model_BRKR.pkl", "models/scaler_BRKR.pkl"))
-    print(f"Model trained and saved at {model_path}")
+    logging.info(f"Model trained and saved at {model_path}")
 
     # Return trained model
     return classifier, sc
@@ -75,7 +82,7 @@ def load_model(model_path):
     # load the model
     classifier = joblib.load(model_path)
     sc = joblib.load(model_path.replace("models/model_BRKR.pkl", "models/scaler_BRKR.pkl"))
-    print("Model and scaler loaded successfully.")
+    logging.info("Model and scaler loaded successfully.")
     return classifier, sc
 
 def predict_next_day(prices_bruker, classifier, sc):
@@ -88,14 +95,14 @@ def predict_next_day(prices_bruker, classifier, sc):
     latest_features_scaled = sc.transform(latest_features)  # Scale it
 
     prediction = classifier.predict(latest_features_scaled)
-    print("Latest features used in ML.py:", latest_features)
+    logging.info(f"Latest features used in ML.py:{latest_features}")
     return "UP" if prediction[0] == 1 else "DOWN"
 
 def evaluate_model(classifier, x_test_scaled, y_test):
     # Evaluate trained model
     y_pred = classifier.predict(x_test_scaled)
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"Model Accuracy: {accuracy:.2f}")
+    logging.info(f"Model Accuracy: {accuracy:.2f}")
     return accuracy
 
 def ml_pipeline(filepath, model_path):
@@ -110,15 +117,15 @@ def ml_pipeline(filepath, model_path):
     if os.path.exists(model_path):
         # Load the trained model
         classifier, sc = load_model(model_path)
-        print("Using saved model for prediction.")
+        logging.debug("Using saved model for prediction.")
     else:
         # Train and save model if not found
-        print("Model not found, training a new one.")
+        logging.debug("Model not found, training a new one.")
         classifier, sc = train_model(x_train_scaled, y_train, model_path, sc)
 
     # Predict next day's movement
     prediction = predict_next_day(prices_bruker, classifier, sc)
-    print(f"Next day's price movement: {prediction}")
+    logging.info(f"Next day's price movement: {prediction}")
 
 if __name__ == "__main__":
     ml_pipeline(filepath, model_path)
