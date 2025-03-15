@@ -12,11 +12,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Moves 
 IMAGE_DIR = os.path.join(BASE_DIR, "images")  # Now correctly points to 'App/images/'
 
 # Debugging - Check if the images folder exists
-if not os.path.exists(IMAGE_DIR):
-    st.error(f"🚨 Folder not found: {IMAGE_DIR}")
-else:
-    st.write("✅ Found 'images/' folder:", IMAGE_DIR)
-    st.write("📂 Files in 'images' folder:", os.listdir(IMAGE_DIR))
+#if not os.path.exists(IMAGE_DIR):
+    #st.error(f"🚨 Folder not found: {IMAGE_DIR}")
+#else:
+   # st.write("✅ Found 'images/' folder:", IMAGE_DIR)
+   # st.write("📂 Files in 'images' folder:", os.listdir(IMAGE_DIR))
 
 # Team Organization Page
 st.title("Team Organization 👨‍💼👩‍💼")

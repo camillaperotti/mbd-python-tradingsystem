@@ -13,11 +13,11 @@ def main():
     IMAGE_DIR = os.path.join(BASE_DIR, "images")  # Ensure it finds 'App/images/' correctly
 
     # Debugging - Check if the images folder exists
-    if not os.path.exists(IMAGE_DIR):
-        st.error(f"🚨 Folder not found: {IMAGE_DIR}")
-    else:
-        st.write("✅ Found 'images/' folder:", IMAGE_DIR)
-        st.write("📂 Files in 'images' folder:", os.listdir(IMAGE_DIR))
+    #if not os.path.exists(IMAGE_DIR):
+        #st.error(f"🚨 Folder not found: {IMAGE_DIR}")
+    #else:
+       # st.write("✅ Found 'images/' folder:", IMAGE_DIR)
+       # st.write("📂 Files in 'images' folder:", os.listdir(IMAGE_DIR))
 
     # Logo Section
     col_logo, col_text = st.columns([1, 3])
