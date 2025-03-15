@@ -3,10 +3,13 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+import sys
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))) ## mac: _init_, windows: __init__
 
 class Company:
     def __init__(self, ticker):
@@ -132,8 +135,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # File paths
-    raw_data_path = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/data/us-shareprices-daily.csv"
-    processed_data_path = "/Users/camillaperotti/Desktop/IE/Courses MBD/Term 2/PDA II/00_GroupProject/mbd-python-tradingsystem/ETL/prices_output.csv"
+   # Get the script's directory
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Default paths (relative to script location)
+    raw_data_path = os.path.join(base_dir, "ETL", "data", "us-shareprices-daily.csv")
+    processed_data_path = os.path.join(base_dir, "ETL", "pricesbruker_output.csv")
 
     print(f"\n========== Running for {args.ticker} ==========\n")
     company = Company(args.ticker)
